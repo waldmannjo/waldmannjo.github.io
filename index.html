@@ -1,338 +1,58 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digitaler Journal-Inspirator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Visualization & Content Choices:
-        - Report Info: Journaling categories and prompts. Goal: Provide users with journaling ideas. Viz/Presentation: Clickable category buttons displaying lists of text prompts. Interaction: Click to switch categories. Justification: Simple, direct, and effective for browsing textual information. Library/Method: HTML/Tailwind for structure, Vanilla JS for dynamic content updates.
-        - New Feature: Negative Reframing. Goal: Help users reframe negative thoughts. Viz/Presentation: Textarea for input, button to trigger LLM, div to display reframed text. Interaction: User input, button click. Justification: Directly addresses user's stated need, provides actionable positive perspective. Library/Method: HTML/Tailwind, Vanilla JS, Gemini API (gemini-2.0-flash).
-        - New Feature: Random Reflection Prompt. Goal: Offer dynamic inspiration for journaling. Viz/Presentation: Button to trigger LLM, div to display prompt. Interaction: Button click. Justification: Adds a quick, fresh source of ideas. Library/Method: HTML/Tailwind, Vanilla JS, Gemini API (gemini-2.0-flash).
-        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FFF7ED; /* bg-orange-50 */
-            color: #374151; /* text-gray-700 */
-        }
-        .nav-button {
-            transition: all 0.2s ease-in-out;
-        }
-        .nav-button.active {
-            background-color: #FDBA74; /* bg-orange-300 */
-            color: #9A3412; /* text-orange-800 */
-            font-weight: 600;
-        }
-        .nav-button:hover:not(.active) {
-            background-color: #FED7AA; /* bg-orange-200 */
-        }
-        .prompt-card {
-            background-color: #FFFAF0; /* lighter orange/cream */
-            border-left: 4px solid #FDBA74; /* bg-orange-300 */
-        }
-        .llm-feature-card {
-            background-color: #FDFCEF; /* very light cream */
-            border: 1px solid #FDBA74; /* orange-300 */
-        }
-        .llm-button {
-            background-color: #F97316; /* orange-500 */
-            color: white;
-            transition: all 0.2s ease-in-out;
-        }
-        .llm-button:hover {
-            background-color: #EA580C; /* orange-600 */
-        }
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #F97316; /* orange-500 */
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col items-center py-8 px-4">
+import React from 'react';
 
-    <div class="w-full max-w-3xl mx-auto">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-orange-600">Digitaler Journal-Inspirator</h1>
-            <p class="mt-3 text-lg text-orange-700">Finde hier Inspiration für deine täglichen Einträge und Reflexionen.</p>
-        </header>
+function App() {
+  return (
+    // Main container for the entire application, using a light blue background
+    // and ensuring the font is set to Inter.
+    <div className="min-h-screen bg-blue-50 font-inter flex flex-col">
+      {/* Navigation Bar */}
+      <nav className="bg-white shadow-sm p-4 flex justify-between items-center">
+        {/* Logo/Site Title */}
+        <div className="text-2xl font-bold text-gray-800">My Portfolio</div>
+        {/* Navigation Links */}
+        <div className="flex space-x-6">
+          <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">Home</a>
+          <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">About</a>
+          <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">Projects</a>
+          <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">Contact</a>
+        </div>
+        {/* Action Buttons */}
+        <div className="flex space-x-4">
+          <button className="px-4 py-2 rounded-lg text-gray-700 border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
+            Login
+          </button>
+          <button className="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors duration-200">
+            Get Started
+          </button>
+        </div>
+      </nav>
 
-        <nav id="categoryNavigation" class="mb-8">
-            <p class="text-sm text-orange-600 font-semibold mb-3 text-center sm:text-left">Wähle eine Kategorie:</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3">
-            </div>
-        </nav>
+      {/* Hero Section - Centered content to mimic the image's main area */}
+      <main className="flex-grow flex items-center justify-center p-4">
+        <div className="text-center max-w-4xl">
+          {/* Main Title */}
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
+            Hello, I'm Jo
+          </h1>
+          {/* Subtitle/Description */}
+          <p className="text-xl md:text-2xl text-gray-700 mb-8 px-4">
+            A passionate [Your Profession/Role] with a focus on [Your Key Skill/Area].
+            I create engaging web experiences and innovative solutions.
+          </p>
 
-        <main id="contentArea" class="space-y-6">
-            <div id="welcomeMessage" class="text-center p-6 bg-white rounded-lg shadow-md">
-                <h2 class="text-2xl font-semibold text-orange-700 mb-2">Willkommen!</h2>
-                <p class="text-gray-600">Wähle oben eine Kategorie aus, um Vorschläge für dein digitales Tagebuch zu entdecken. Jeder Eintrag kann dir helfen, mehr über dich selbst zu erfahren und dein Wohlbefinden zu steigern.</p>
-            </div>
-
-            <section class="space-y-6">
-                <h2 class="text-3xl font-semibold text-orange-700 mb-6 flex items-center">
-                    <span class="mr-3 text-4xl">🤖</span> KI-gestützte Journal-Helfer
-                </h2>
-
-                <div class="llm-feature-card p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-orange-700 mb-4 flex items-center">
-                        <span class="mr-2">✨</span> Negatives Reframing
-                    </h3>
-                    <p class="text-gray-600 mb-4">Gib einen negativen Gedanken ein, und die KI hilft dir, ihn in eine positivere oder konstruktivere Perspektive umzuformulieren.</p>
-                    <textarea id="negativeThoughtInput" class="w-full p-3 border border-orange-300 rounded-md focus:ring-orange-400 focus:border-orange-400 mb-4" rows="3" placeholder="Ich bin heute so unproduktiv gewesen..."></textarea>
-                    <button id="reframeButton" class="llm-button px-6 py-3 rounded-md font-semibold flex items-center justify-center">
-                        <span id="reframeButtonText">Gedanken umformulieren</span>
-                        <div id="reframeLoading" class="loading-spinner ml-3 hidden"></div>
-                    </button>
-                    <div id="reframedOutput" class="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-md text-gray-700 hidden">
-                        <p class="font-medium text-orange-800 mb-2">Neu formuliert:</p>
-                        <p id="reframedText"></p>
-                    </div>
-                </div>
-
-                <div class="llm-feature-card p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-orange-700 mb-4 flex items-center">
-                        <span class="mr-2">✨</span> Zufälliger Reflexionsimpuls
-                    </h3>
-                    <p class="text-gray-600 mb-4">Brauchst du eine neue Idee für deinen Tagebucheintrag? Klicke hier für einen zufälligen Impuls!</p>
-                    <button id="generatePromptButton" class="llm-button px-6 py-3 rounded-md font-semibold flex items-center justify-center">
-                        <span id="generatePromptButtonText">Impuls generieren</span>
-                        <div id="generatePromptLoading" class="loading-spinner ml-3 hidden"></div>
-                    </button>
-                    <div id="generatedPromptOutput" class="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-md text-gray-700 hidden">
-                        <p class="font-medium text-orange-800 mb-2">Dein Impuls:</p>
-                        <p id="generatedPromptText"></p>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="text-center mt-12 py-6 border-t border-orange-200">
-            <p class="text-sm text-orange-600">&copy; 2025 Dein Digitaler Journal-Inspirator. Viel Spaß beim Schreiben!</p>
-        </footer>
+          {/* Action Buttons - Styled to match the image's buttons */}
+          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <button className="bg-white text-gray-800 font-semibold py-3 px-8 rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.8)] hover:shadow-[4px_4px_0px_rgba(0,0,0,0.8)] transition-all duration-200 transform hover:-translate-y-0.5 hover:translate-x-0.5 border border-gray-300">
+              Explore My Work
+            </button>
+            <button className="bg-white text-gray-800 font-semibold py-3 px-8 rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,0.8)] hover:shadow-[4px_4px_0px_rgba(0,0,0,0.8)] transition-all duration-200 transform hover:-translate-y-0.5 hover:translate-x-0.5 border border-gray-300">
+              Get In Touch
+            </button>
+          </div>
+        </div>
+      </main>
     </div>
+  );
+}
 
-    <script>
-        const journalData = {
-            "Positive Reflexion und Wachstum": {
-                icon: '✨',
-                prompts: [
-                    { title: "Tägliche Erfolge", description: "Was hast du heute erreicht, egal wie klein es war? Das können berufliche Aufgaben, persönliche Meilensteine oder auch nur das Erledigen einer lästigen Pflicht sein." },
-                    { title: "Lernmomente", description: "Was hast du heute Neues gelernt? Das kann eine Information, eine Erkenntnis über dich selbst oder andere, oder eine neue Fähigkeit sein." },
-                    { title: "Freudige Momente / Kleine Glücksmomente", description: "Was hat dich heute zum Lächeln gebracht, dir Freude bereitet oder dich überrascht? Es hilft, die kleinen Dinge im Alltag wertzuschätzen." },
-                    { title: "Inspirationen", description: "Ein Zitat, ein Lied, ein Bild, ein Gespräch oder eine Beobachtung, die dich inspiriert oder zum Nachdenken angeregt hat." },
-                    { title: "Ziele und Fortschritte", description: "Welche Ziele hast du dir gesetzt und wie bist du ihnen heute nähergekommen? Das kann dir helfen, deine Fortschritte zu visualisieren." },
-                    { title: "Komplimente, die du erhalten hast", description: "Halte positive Rückmeldungen fest, die du von anderen bekommen hast. Das stärkt dein Selbstwertgefühl." }
-                ]
-            },
-            "Selbstreflexion und Achtsamkeit": {
-                icon: '🧘',
-                prompts: [
-                    { title: "Deine Gefühle", description: "Wie hast du dich heute gefühlt? Welche Emotionen waren präsent und was hat sie ausgelöst? Das hilft, deine emotionale Landschaft besser zu verstehen." },
-                    { title: "Körperliche Empfindungen", description: "Wie geht es deinem Körper? Hast du Schmerzen, bist du müde, voller Energie? Das fördert die Körperwahrnehmung." },
-                    { title: "Achtsamkeitsmomente", description: "Momente, in denen du ganz im Hier und Jetzt warst und etwas bewusst wahrgenommen hast (z.B. den Geruch von Kaffee, das Gefühl von Regen auf der Haut, das Zwitschern der Vögel)." },
-                    { title: "Herausforderungen des Tages", description: "Was war heute schwierig oder hat dich herausgefordert? Wie bist du damit umgegangen?" }
-                ]
-            },
-            "Planung und Organisation": {
-                icon: '📅',
-                prompts: [
-                    { title: "Aufgaben für morgen", description: "Was möchtest du am nächsten Tag erledigen? Eine kurze Liste kann helfen, den Kopf freizubekommen." },
-                    { title: "Ideen und Gedankenblitze", description: "Halte spontane Einfälle, Projektideen oder Lösungen für Probleme fest, bevor sie vergessen sind." },
-                    { title: "Wichtige Termine/Ereignisse", description: "Eine kurze Notiz zu besonderen Vorkommnissen des Tages." }
-                ]
-            },
-            "Kreativität und persönliche Entwicklung": {
-                icon: '💡',
-                prompts: [
-                    { title: "Träume", description: "Wenn du dich an deine Träume erinnerst, kannst du sie notieren und vielleicht Muster oder Botschaften erkennen." },
-                    { title: "Fragen an dich selbst", description: "Welche Fragen beschäftigen dich gerade? Das kann den Denkprozess anregen." },
-                    { title: "Wünsche und Visionen", description: "Was wünschst du dir für die Zukunft? Welche Visionen hast du für dein Leben?" }
-                ]
-            }
-        };
-
-        const navigationContainer = document.querySelector('#categoryNavigation div');
-        const contentArea = document.getElementById('contentArea');
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        let currentActiveButton = null;
-
-        const negativeThoughtInput = document.getElementById('negativeThoughtInput');
-        const reframeButton = document.getElementById('reframeButton');
-        const reframeButtonText = document.getElementById('reframeButtonText');
-        const reframeLoading = document.getElementById('reframeLoading');
-        const reframedOutput = document.getElementById('reframedOutput');
-        const reframedText = document.getElementById('reframedText');
-
-        const generatePromptButton = document.getElementById('generatePromptButton');
-        const generatePromptButtonText = document.getElementById('generatePromptButtonText');
-        const generatePromptLoading = document.getElementById('generatePromptLoading');
-        const generatedPromptOutput = document.getElementById('generatedPromptOutput');
-        const generatedPromptText = document.getElementById('generatedPromptText');
-
-        const reflectionThemes = [
-            "Dankbarkeit", "Wachstum", "Achtsamkeit", "Selbstfürsorge", "Herausforderungen meistern",
-            "Freude", "Lernen", "Ziele", "Beziehungen", "Inspiration"
-        ];
-
-        async function callGeminiAPI(prompt) {
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    return result.candidates[0].content.parts[0].text;
-                } else {
-                    console.error("Unexpected API response structure:", result);
-                    return "Fehler: Konnte keine Antwort generieren.";
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API:", error);
-                return "Fehler: API-Aufruf fehlgeschlagen. Bitte versuche es später erneut.";
-            }
-        }
-
-        reframeButton.addEventListener('click', async () => {
-            const negativeThought = negativeThoughtInput.value.trim();
-            if (negativeThought === "") {
-                reframedText.textContent = "Bitte gib einen Gedanken ein, der umformuliert werden soll.";
-                reframedOutput.classList.remove('hidden');
-                return;
-            }
-
-            reframeButton.disabled = true;
-            reframeButtonText.textContent = "Umformulieren...";
-            reframeLoading.classList.remove('hidden');
-            reframedOutput.classList.add('hidden');
-
-            const prompt = `Formuliere den folgenden negativen Gedanken in eine positivere, konstruktivere oder neutralere Perspektive um. Konzentriere dich auf Wachstum, Lernen oder umsetzbare Schritte. Halte es prägnant. Negativer Gedanke: '${negativeThought}'`;
-            const reframed = await callGeminiAPI(prompt);
-
-            reframedText.textContent = reframed;
-            reframedOutput.classList.remove('hidden');
-            reframeButton.disabled = false;
-            reframeButtonText.textContent = "Gedanken umformulieren";
-            reframeLoading.classList.add('hidden');
-        });
-
-        generatePromptButton.addEventListener('click', async () => {
-            generatePromptButton.disabled = true;
-            generatePromptButtonText.textContent = "Generieren...";
-            generatePromptLoading.classList.remove('hidden');
-            generatedPromptOutput.classList.add('hidden');
-
-            const randomTheme = reflectionThemes[Math.floor(Math.random() * reflectionThemes.length)];
-            const prompt = `Generiere einen prägnanten, zum Nachdenken anregenden Journaling-Impuls zum Thema "${randomTheme}". Der Impuls sollte zur Selbstbeobachtung und positivem Denken anregen. Gib nur den Impuls selbst an, keinen zusätzlichen Text.`;
-            const generated = await callGeminiAPI(prompt);
-
-            generatedPromptText.textContent = generated;
-            generatedPromptOutput.classList.remove('hidden');
-            generatePromptButton.disabled = false;
-            generatePromptButtonText.textContent = "Impuls generieren";
-            generatePromptLoading.classList.add('hidden');
-        });
-
-        function displayPrompts(categoryKey) {
-            welcomeMessage.classList.add('hidden');
-            contentArea.innerHTML = ''; 
-
-            const category = journalData[categoryKey];
-            if (!category) {
-                contentArea.innerHTML = '<p class="text-red-500">Kategorie nicht gefunden.</p>';
-                return;
-            }
-            
-            const categoryHeader = document.createElement('h2');
-            categoryHeader.className = 'text-3xl font-semibold text-orange-700 mb-6 flex items-center';
-            categoryHeader.innerHTML = `<span class="mr-3 text-4xl">${category.icon}</span> ${categoryKey}`;
-            contentArea.appendChild(categoryHeader);
-            
-            const introParagraph = document.createElement('p');
-            introParagraph.className = 'text-gray-600 mb-6 text-md';
-            
-            let introText = `Hier findest du Anregungen zum Thema "${categoryKey}". Diese Impulse können dir helfen, tiefer in deine Gedanken und Gefühle einzutauchen und wertvolle Erkenntnisse für dein persönliches Wachstum zu gewinnen.`;
-            if (categoryKey === "Positive Reflexion und Wachstum") {
-                introText = `Diese Kategorie hilft dir, dich auf das Gute zu konzentrieren und deine Fortschritte zu würdigen. Entdecke Anregungen, um positive Aspekte deines Lebens hervorzuheben und dein persönliches Wachstum zu fördern.`;
-            } else if (categoryKey === "Selbstreflexion und Achtsamkeit") {
-                introText = `Nimm dir Zeit für dich. Die folgenden Impulse laden dich ein, deine inneren Zustände achtsam wahrzunehmen und dich besser zu verstehen. Ideal, um den Tag bewusst ausklingen zu lassen oder zu beginnen.`;
-            } else if (categoryKey === "Planung und Organisation") {
-                introText = `Ein klarer Kopf beginnt oft mit guter Organisation. Nutze diese Vorschläge, um deine Gedanken zu sortieren, Pläne zu schmieden und den Überblick zu behalten.`;
-            } else if (categoryKey === "Kreativität und persönliche Entwicklung") {
-                introText = `Entfessle dein kreatives Potenzial und erkunde neue Facetten deiner Persönlichkeit. Diese Fragen und Ideen sollen dich inspirieren, über den Tellerrand zu schauen und dich weiterzuentwickeln.`;
-            }
-            introParagraph.textContent = introText;
-            contentArea.appendChild(introParagraph);
-
-
-            category.prompts.forEach(prompt => {
-                const card = document.createElement('div');
-                card.className = 'prompt-card p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200';
-                
-                const title = document.createElement('h3');
-                title.className = 'text-xl font-semibold text-orange-700 mb-2';
-                title.textContent = prompt.title;
-                card.appendChild(title);
-                
-                const description = document.createElement('p');
-                description.className = 'text-gray-600 text-md';
-                description.textContent = prompt.description;
-                card.appendChild(description);
-                
-                contentArea.appendChild(card);
-            });
-
-            // Re-append LLM features section after category content
-            const llmSection = document.querySelector('section');
-            if (llmSection && !contentArea.contains(llmSection)) {
-                contentArea.appendChild(llmSection);
-            }
-        }
-
-        Object.keys(journalData).forEach(categoryKey => {
-            const button = document.createElement('button');
-            button.className = 'nav-button w-full text-left p-4 bg-white rounded-lg shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-400 flex items-center justify-between';
-            button.innerHTML = `
-                <span class="flex items-center">
-                    <span class="mr-3 text-2xl">${journalData[categoryKey].icon}</span>
-                    <span class="font-medium text-gray-700">${categoryKey}</span>
-                </span>
-                <span class="text-orange-500 text-xl">&#8250;</span>`;
-            button.setAttribute('data-category', categoryKey);
-            
-            button.addEventListener('click', () => {
-                if (currentActiveButton) {
-                    currentActiveButton.classList.remove('active');
-                    currentActiveButton.querySelector('.text-gray-700, .text-orange-800').classList.replace('text-orange-800', 'text-gray-700');
-                }
-                button.classList.add('active');
-                button.querySelector('.text-gray-700').classList.replace('text-gray-700', 'text-orange-800');
-                currentActiveButton = button;
-                displayPrompts(categoryKey);
-            });
-            
-            navigationContainer.appendChild(button);
-        });
-
-    </script>
-</body>
-</html>
+export default App;
